@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'controllers/auth_controller.dart';
@@ -12,8 +13,12 @@ import 'views/home/product_detail_screen.dart';
 import 'views/home/search_screen.dart';
 import 'views/cart/cart_screen.dart';
 import 'views/profile/edit_profile_screen.dart';
+import 'views/profile/orders_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+
   // Initialize Controllers globally
   Get.put(AuthController());
   Get.put(ProductController());
@@ -45,6 +50,7 @@ class MyApp extends StatelessWidget {
         GetPage(name: '/search', page: () => const SearchScreen()),
         GetPage(name: '/cart', page: () => CartScreen()),
         GetPage(name: '/edit-profile', page: () => const EditProfileScreen()),
+        GetPage(name: '/orders', page: () => const OrdersScreen()),
       ],
     );
   }

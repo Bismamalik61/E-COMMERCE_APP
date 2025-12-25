@@ -18,9 +18,31 @@ class ProfileScreen extends StatelessWidget {
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            const CircleAvatar(
-              radius: 60,
-              backgroundImage: NetworkImage('https://images.unsplash.com/photo-1633332755192-727a05c4013d?q=80&w=2000&auto=format&fit=crop'),
+            Stack(
+              children: [
+                Obx(() => CircleAvatar(
+                  radius: 60,
+                  backgroundColor: Colors.grey[200],
+                  backgroundImage: authController.profilePicUrl.value.isNotEmpty
+                      ? NetworkImage(authController.profilePicUrl.value)
+                      : const NetworkImage('https://via.placeholder.com/150'),
+                )),
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  child: GestureDetector(
+                    onTap: () => authController.uploadProfilePicture(),
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: const BoxDecoration(
+                        color: Colors.blue,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.camera_alt, color: Colors.white, size: 20),
+                    ),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 16),
             Obx(() => Text(
@@ -32,10 +54,9 @@ class ProfileScreen extends StatelessWidget {
               style: TextStyle(color: Colors.grey[600]),
             )),
             const SizedBox(height: 32),
-            _buildProfileItem(Icons.person_outline, 'My Account', () {
-              Get.toNamed('/edit-profile');
+            _buildProfileItem(Icons.shopping_bag_outlined, 'My Orders', () {
+              Get.toNamed('/orders');
             }),
-            _buildProfileItem(Icons.shopping_bag_outlined, 'My Orders', () {}),
             _buildProfileItem(Icons.location_on_outlined, 'Shipping Address', () {}),
             _buildProfileItem(Icons.payment_outlined, 'Payment Methods', () {}),
             _buildProfileItem(Icons.settings_outlined, 'Settings', () {}),

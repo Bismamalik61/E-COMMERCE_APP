@@ -16,4 +16,28 @@ class Product {
     required this.category,
     this.rating = 4.5,
   });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'name': name,
+      'description': description,
+      'price': price,
+      'imageUrl': imageUrl,
+      'category': category,
+      'rating': rating,
+    };
+  }
+
+  factory Product.fromMap(Map<String, dynamic> map) {
+    return Product(
+      id: map['id'] ?? '',
+      name: map['name'] ?? '',
+      description: map['description'] ?? '',
+      price: (map['price'] as num).toDouble(),
+      imageUrl: map['imageUrl'] ?? '',
+      category: map['category'] ?? '',
+      rating: (map['rating'] as num).toDouble(),
+    );
+  }
 }

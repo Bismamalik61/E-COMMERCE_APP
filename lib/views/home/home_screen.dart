@@ -15,28 +15,17 @@ class HomeScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'E-Shop',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
+        title: const Text('E-Shop', style: TextStyle(fontWeight: FontWeight.bold)),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () => Get.toNamed('/search'),
-          ),
-
-          IconButton(
-            icon: const Icon(Icons.notifications_none),
-            onPressed: () {},
-          ),
+          IconButton(icon: const Icon(Icons.search), onPressed: () => Get.toNamed('/search')),
+          IconButton(icon: const Icon(Icons.notifications_none), onPressed: () {}),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Banner Slider
-            Padding(
+      body: CustomScrollView(
+        slivers: [
+          // Banner Slider
+          SliverToBoxAdapter(
+            child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 16.0),
               child: CarouselSlider(
                 options: CarouselOptions(
@@ -54,8 +43,7 @@ class HomeScreen extends StatelessWidget {
                           imageUrl: i,
                           fit: BoxFit.cover,
                           width: double.infinity,
-                          placeholder: (context, url) =>
-                              Container(color: Colors.grey[200]),
+                          placeholder: (context, url) => Container(color: Colors.grey[200]),
                         ),
                       );
                     },
@@ -63,19 +51,25 @@ class HomeScreen extends StatelessWidget {
                 }).toList(),
               ),
             ),
+          ),
 
-            // Categories
-            const Padding(
+          // Categories Header
+          const SliverToBoxAdapter(
+            child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.0),
               child: Text(
                 'Categories',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
             ),
-            const SizedBox(height: 8),
-            Obx(
-              () => SizedBox(
-                height: 40,
+          ),
+
+          // Categories Chips
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: Obx(() => SizedBox(
+                height: 48,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -84,63 +78,67 @@ class HomeScreen extends StatelessWidget {
                     final cat = productController.categories[index];
                     return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 4),
-                      child: Obx(
-                        () => ChoiceChip(
-                          label: Text(cat),
-                          selected:
-                              productController.selectedCategory.value == cat,
-                          onSelected: (selected) =>
-                              productController.changeCategory(cat),
-                          selectedColor: Theme.of(context).primaryColor,
-                          labelStyle: TextStyle(
-                            color:
-                                productController.selectedCategory.value == cat
-                                ? Colors.white
-                                : Colors.black,
-                          ),
+                      child: Obx(() => ChoiceChip(
+                        label: Text(cat),
+                        selected: productController.selectedCategory.value == cat,
+                        onSelected: (selected) => productController.changeCategory(cat),
+                        selectedColor: Theme.of(context).primaryColor,
+                        labelStyle: TextStyle(
+                          color: productController.selectedCategory.value == cat ? Colors.white : Colors.black,
                         ),
-                      ),
+                      )),
                     );
                   },
                 ),
-              ),
+              )),
             ),
+          ),
 
-            const SizedBox(height: 16),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.0),
+          const SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
               child: Text(
                 'New Arrivals',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
             ),
-            const SizedBox(height: 8),
+          ),
 
-            // Product Grid
-            Obx(() {
-              if (productController.isLoading.value) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              return GridView.builder(
-                padding: const EdgeInsets.all(16),
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
+          // Product Grid (Lazy loading)
+          Obx(() {
+            if (productController.isLoading.value) {
+              return const SliverFillRemaining(
+                child: Center(child: CircularProgressIndicator()),
+              );
+            }
+            
+            if (productController.filteredProducts.isEmpty) {
+              return const SliverFillRemaining(
+                child: Center(child: Text('No products found')),
+              );
+            }
+
+            return SliverPadding(
+              padding: const EdgeInsets.all(16),
+              sliver: SliverGrid(
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
                   childAspectRatio: 0.7,
                   crossAxisSpacing: 16,
                   mainAxisSpacing: 16,
                 ),
-                itemCount: productController.filteredProducts.length,
-                itemBuilder: (context, index) {
-                  return ProductCard(
-                    product: productController.filteredProducts[index],
-                  );
-                },
-              );
-            }),
-          ],
-        ),
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    return ProductCard(
+                      product: productController.filteredProducts[index],
+                    );
+                  },
+                  childCount: productController.filteredProducts.length,
+                ),
+              ),
+            );
+          }),
+        ],
       ),
     );
   }

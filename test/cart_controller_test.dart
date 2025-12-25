@@ -2,18 +2,23 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:e_com_app/controllers/cart_controller.dart';
 import 'package:e_com_app/models/product_model.dart';
 import 'package:get/get.dart';
+import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
+import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 
 void main() {
-   setUp(() {
-    Get.put(CartController());
-  });
-    TestWidgetsFlutterBinding.ensureInitialized();
+  TestWidgetsFlutterBinding.ensureInitialized();
+  
   group('CartController Tests', () {
     late CartController cartController;
     late Product testProduct;
+    late FakeFirebaseFirestore mockFirestore;
+    late MockFirebaseAuth mockAuth;
 
     setUp(() {
-      cartController = CartController();
+      mockFirestore = FakeFirebaseFirestore();
+      mockAuth = MockFirebaseAuth(signedIn: true);
+      cartController = CartController(firestore: mockFirestore, auth: mockAuth);
+      
       testProduct = Product(
         id: '1',
         name: 'Test Product',
@@ -23,6 +28,10 @@ void main() {
         category: 'Test',
         rating: 4.5,
       );
+    });
+
+    tearDown(() {
+      Get.reset();
     });
 
     test('Initial cart should be empty', () {

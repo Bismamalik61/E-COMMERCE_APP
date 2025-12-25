@@ -148,16 +148,20 @@ class CartScreen extends StatelessWidget {
               const SizedBox(height: 24),
               SizedBox(
                 width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Get.snackbar('Checkout', 'Proceeding to payment...', snackPosition: SnackPosition.BOTTOM);
-                  },
+                child: Obx(() => ElevatedButton(
+                  onPressed: cartController.isLoading.value 
+                    ? null 
+                    : () => cartController.checkout(),
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
+                    backgroundColor: Theme.of(context).primaryColor,
+                    foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                   ),
-                  child: const Text('Checkout', style: TextStyle(fontSize: 18)),
-                ),
+                  child: cartController.isLoading.value
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Text('Checkout', style: TextStyle(fontSize: 18)),
+                )),
               ),
             ],
           ),

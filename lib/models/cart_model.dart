@@ -1,4 +1,4 @@
-import 'product_model.dart';
+import 'package:e_com_app/models/product_model.dart';
 
 class CartItem {
   final Product product;
@@ -10,4 +10,18 @@ class CartItem {
   });
 
   double get total => product.price * quantity;
+
+  Map<String, dynamic> toMap() {
+    return {
+      'product': product.toMap(),
+      'quantity': quantity,
+    };
+  }
+
+  factory CartItem.fromMap(Map<String, dynamic> map) {
+    return CartItem(
+      product: Product.fromMap(map['product']),
+      quantity: map['quantity'] ?? 1,
+    );
+  }
 }
